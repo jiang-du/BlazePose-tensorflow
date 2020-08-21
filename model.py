@@ -1,18 +1,23 @@
 import tensorflow as tf
+from config import num_joints
 
 class BlazeBlock(tf.keras.Model):
-    def __init__(self, block_num = 3, channel = 48):
+    def __init__(self, block_num = 3, channel = 48, channel_padding = 1):
         super(BlazeBlock, self).__init__()
         # <----- downsample ----->
         self.downsample_a = tf.keras.models.Sequential([
             tf.keras.layers.DepthwiseConv2D(kernel_size=3, strides=(2, 2), padding='same', activation=None),
             tf.keras.layers.Conv2D(filters=channel, kernel_size=1, activation=None)
         ])
-        self.downsample_b = tf.keras.models.Sequential([
-            tf.keras.layers.MaxPool2D(pool_size=(2, 2)),
-            # 因为我实在是不会写channel padding的实现，所以这里用了个1x1的卷积来凑个数，嘤~
-            tf.keras.layers.Conv2D(filters=channel, kernel_size=1, activation=None)
-        ])
+        if channel_padding:
+            self.downsample_b = tf.keras.models.Sequential([
+                tf.keras.layers.MaxPool2D(pool_size=(2, 2)),
+                # 因为我实在是不会写channel padding的实现，所以这里用了个1x1的卷积来凑个数，嘤~
+                tf.keras.layers.Conv2D(filters=channel, kernel_size=1, activation=None)
+            ])
+        else:
+            # channel number invariance
+            self.downsample_b = tf.keras.layers.MaxPool2D(pool_size=(2, 2))
         # <----- separable convolution ----->
         self.conv = list()
         for i in range(block_num):
@@ -22,6 +27,12 @@ class BlazeBlock(tf.keras.Model):
         ]))
 
     def call(self, x):
+        """
+        y1 = self.downsample_a(x)
+        y2 = self.downsample_b(x)
+        y2 = tf.pad(y2, [[0, 0], [0, 0], [0, 0], [0, y1.shape[3] - y2.shape[3]]])
+        x = tf.keras.activations.relu(y1 + y2)
+        """
         x = tf.keras.activations.relu(self.downsample_a(x) + self.downsample_b(x))
         for conv_layer in range(self.conv):
             x = tf.keras.activations.relu(x + conv_layer(x))
@@ -44,7 +55,7 @@ class BlazePose(tf.keras.Model):
             tf.keras.layers.Conv2D(filters=24, kernel_size=1, activation=None)
         ])
 
-        # heatmap encoder
+        #  ---------- Heatmap branch ----------
         self.conv3 = BlazeBlock(block_num = 3, channel = 48)    # input res: 128
         self.conv4 = BlazeBlock(block_num = 4, channel = 96)    # input res: 64
         self.conv5 = BlazeBlock(block_num = 5, channel = 192)   # input res: 32
@@ -86,16 +97,42 @@ class BlazePose(tf.keras.Model):
         self.conv11 = tf.keras.models.Sequential([
             tf.keras.layers.DepthwiseConv2D(kernel_size=3, padding="same", activation=None),
             tf.keras.layers.Conv2D(filters=8, kernel_size=1, activation="relu"),
-            tf.keras.layers.Conv2D(filters=1, kernel_size=3, activation=None)
+            # heatmap
+            tf.keras.layers.Conv2D(filters=num_joints, kernel_size=3, activation=None)
         ])
 
-        # regression branch
+        # ---------- Regression branch ----------
+        #  shape = (1, 64, 64, 48)
         self.conv12a = BlazeBlock(block_num = 4, channel = 96)    # input res: 64
         self.conv12b = tf.keras.models.Sequential([
             tf.keras.layers.DepthwiseConv2D(kernel_size=3, padding="same", activation=None),
             tf.keras.layers.Conv2D(filters=96, kernel_size=1, activation="relu")
         ])
 
+        self.conv13a = BlazeBlock(block_num = 5, channel = 192)   # input res: 32
+        self.conv13b = tf.keras.models.Sequential([
+            tf.keras.layers.DepthwiseConv2D(kernel_size=3, padding="same", activation=None),
+            tf.keras.layers.Conv2D(filters=192, kernel_size=1, activation="relu")
+        ])
+
+        self.conv14a = BlazeBlock(block_num = 6, channel = 288)   # input res: 16
+        self.conv14b = tf.keras.models.Sequential([
+            tf.keras.layers.DepthwiseConv2D(kernel_size=3, padding="same", activation=None),
+            tf.keras.layers.Conv2D(filters=288, kernel_size=1, activation="relu")
+        ])
+
+        self.conv15 = tf.keras.models.Sequential([
+            BlazeBlock(block_num = 7, channel = 288, channel_padding = 0),
+            BlazeBlock(block_num = 7, channel = 288, channel_padding = 0)
+        ])
+
+        self.conv16 = tf.keras.models.Sequential([
+            tf.keras.layers.GlobalAveragePooling2D(),
+            # shape = (1, 1, 1, 288)
+            tf.keras.layers.Dense(units=3*num_joints, activation=None),
+            tf.keras.layers.Reshape((num_joints, 3))
+        ])
+        
     def call(self, x):
         # shape = (1, 256, 256, 3)
         x = self.conv1(x)
@@ -122,7 +159,14 @@ class BlazePose(tf.keras.Model):
         # shape = (1, 128, 128, 8)
         heatmap = self.conv11(y)
 
-        # regression branch
-        x = self.conv12(x) + self.conv12b
+        # ---------- regression branch ----------
+        x = self.conv12a(x) + self.conv12b(y2)
         # shape = (1, 32, 32, 96)
-        return heatmap
+        x = self.conv13a(x) + self.conv13b(y3)
+        # shape = (1, 16, 16, 192)
+        x = self.conv14a(x) + self.conv14b(y4)
+        # shape = (1, 8, 8, 288)
+        x = self.conv15(x)
+        # shape = (1, 2, 2, 288)
+        joints = self.conv16(x)
+        return heatmap, joints
