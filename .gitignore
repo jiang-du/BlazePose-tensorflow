@@ -1,0 +1,12 @@
+__pycache__
+
+.vscode
+
+dataset
+checkpoints
+
+*.jpg
+*.png
+*.svg
+*.pdf
+*.tflite

@@ -34,8 +34,8 @@ class BlazeBlock(tf.keras.Model):
         x = tf.keras.activations.relu(y1 + y2)
         """
         x = tf.keras.activations.relu(self.downsample_a(x) + self.downsample_b(x))
-        for conv_layer in range(self.conv):
-            x = tf.keras.activations.relu(x + conv_layer(x))
+        for i in range(len(self.conv)):
+            x = tf.keras.activations.relu(x + self.conv[i](x))
         return x
 
 class BlazePose(tf.keras.Model):
@@ -98,7 +98,7 @@ class BlazePose(tf.keras.Model):
             tf.keras.layers.DepthwiseConv2D(kernel_size=3, padding="same", activation=None),
             tf.keras.layers.Conv2D(filters=8, kernel_size=1, activation="relu"),
             # heatmap
-            tf.keras.layers.Conv2D(filters=num_joints, kernel_size=3, activation=None)
+            tf.keras.layers.Conv2D(filters=num_joints, kernel_size=3, padding="same", activation=None)
         ])
 
         # ---------- Regression branch ----------
@@ -132,7 +132,7 @@ class BlazePose(tf.keras.Model):
             tf.keras.layers.Dense(units=3*num_joints, activation=None),
             tf.keras.layers.Reshape((num_joints, 3))
         ])
-        
+
     def call(self, x):
         # shape = (1, 256, 256, 3)
         x = self.conv1(x)
@@ -169,4 +169,4 @@ class BlazePose(tf.keras.Model):
         x = self.conv15(x)
         # shape = (1, 2, 2, 288)
         joints = self.conv16(x)
-        return heatmap, joints
+        return heatmap # heatmap, joints
