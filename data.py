@@ -4,7 +4,7 @@ import platform
 import numpy as np
 import tensorflow as tf
 from scipy.io import loadmat
-from config import num_joints, batch_size, gpu_dynamic_memory
+from config import num_joints, batch_size, gaussian_sigma, gpu_dynamic_memory
 
 DataURL = "https://sam.johnson.io/research/lsp_dataset.zip"
 
@@ -104,7 +104,7 @@ for i in range(2000):
     for j in range(num_joints):
         _joint = (label[i, j, 0:2] // 2).astype(np.uint16)
         # print(_joint)
-        heatmap_set[i, :, :, j] = getGaussianMap(joint = _joint, heat_size = 128)
+        heatmap_set[i, :, :, j] = getGaussianMap(joint = _joint, heat_size = 128, sigma = gaussian_sigma)
     # print status
     if not i%(2000//80):
         print(">", end='')

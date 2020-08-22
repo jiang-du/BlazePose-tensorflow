@@ -157,7 +157,7 @@ class BlazePose(tf.keras.Model):
         # shape = (1, 64, 64, 48)
         y = self.conv10a(x) + self.conv10b(y0)
         # shape = (1, 128, 128, 8)
-        heatmap = self.conv11(y)
+        heatmap = tf.keras.activations.sigmoid(self.conv11(y))
 
         # ---------- regression branch ----------
         x = self.conv12a(x) + self.conv12b(y2)
