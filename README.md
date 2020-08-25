@@ -35,6 +35,8 @@ matplotlib
 
 - [x] Basic code for network model BlazePose.
 
+  - [x] Implementation of Channel Attention layer.
+
 - [ ] Dataset and preprocess.
 
     - [x] LSP dataset train and validation.
@@ -46,6 +48,20 @@ matplotlib
 - [ ] Two stage training.
 
 - [ ] Online camera demo.
+
+## Reference
+
+If the original paper helps your research, you can cite this paper in the LaTex file with:
+
+```tex
+@article{Bazarevsky2020BlazePoseOR,
+  title={BlazePose: On-device Real-time Body Pose tracking},
+  author={Valentin Bazarevsky and I. Grishchenko and K. Raveendran and Tyler Lixuan Zhu and Fangfang Zhang and M. Grundmann},
+  journal={ArXiv},
+  year={2020},
+  volume={abs/2006.10204}
+}
+```
 
 ## Comments
 
