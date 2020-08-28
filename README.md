@@ -65,4 +65,4 @@ If the original paper helps your research, you can cite this paper in the LaTex 
 
 ## Comments
 
-Please feel free to submit an issue or pull a request.
+Please feel free to [submit an issue](https://github.com/jiang-du/BlazePose-tensorflow/issues) or [pull a request](https://github.com/jiang-du/BlazePose-tensorflow/pulls).

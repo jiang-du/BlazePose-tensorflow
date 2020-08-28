@@ -1,6 +1,6 @@
 import tensorflow as tf
 from layers import BlazeBlock
-from config import num_joints
+from config import num_joints, train_mode
 
 class BlazePose(tf.keras.Model):
     def __init__(self):
@@ -133,4 +133,5 @@ class BlazePose(tf.keras.Model):
         x = self.conv15(x)
         # shape = (1, 2, 2, 288)
         joints = self.conv16(x)
-        return heatmap # heatmap, joints
+        result = [heatmap, joints]
+        return result[train_mode] # heatmap, joints

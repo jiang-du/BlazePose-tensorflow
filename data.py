@@ -118,4 +118,11 @@ SHUFFLE_BUFFER_SIZE = 1000
 train_dataset = train_dataset.shuffle(SHUFFLE_BUFFER_SIZE).batch(batch_size)
 test_dataset = test_dataset.batch(batch_size)
 
+# Finetune
+finetune_train = tf.data.Dataset.from_tensor_slices((data[0:1000], label[0:1000]))
+finetune_validation = tf.data.Dataset.from_tensor_slices((data[1000:-1], label[1000:-1]))
+
+finetune_train = finetune_train.shuffle(SHUFFLE_BUFFER_SIZE).batch(batch_size)
+finetune_validation = finetune_validation.batch(batch_size)
+
 print("Done.")
