@@ -23,13 +23,29 @@ matplotlib
 
 1. Modify training settings in `config.py`.
 
+  For pre-train of heatmap, set `train_mode = 0`. Or fine-tune, set `train_mode = 1`.
+
 2. Run `python3 train.py`.
 
 3. If you are the first time to run this code, LSP dataset will be downloaded. Especially, if you are using Microsoft Windows 10, please download and unzip the dataset manually.
 
 ## Test
 
-1. Run `python3 test.py`.
+1. Modify training settings in `config.py`.
+
+  If you want to see the heatmaps, set `train_mode = 0`.
+  
+  For skeleton joint results, set `train_mode = 1`.
+
+2. If you are the first time to test, open terminal:
+
+  ```bash
+  mkdir result
+  ```
+
+3. Run `python3 test.py`.
+
+  The tested images will be written in `result` dictionary.
 
 ## TODOs
 
@@ -45,7 +61,7 @@ matplotlib
 
     - [ ] Custom dataset.
 
-- [ ] Two stage training.
+- [x] Two stage training (pre-train and fine-tune).
 
 - [ ] Online camera demo.
 
