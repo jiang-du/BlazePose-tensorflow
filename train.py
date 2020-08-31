@@ -26,7 +26,7 @@ def grad(model, inputs, targets):
 
 # continue train
 if continue_train > 0:
-    model.load_weights(checkpoint_path.format(epoch=50))
+    model.load_weights(checkpoint_path.format(epoch=continue_train))
 
 if train_mode:
     # finetune
