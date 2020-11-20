@@ -1,4 +1,3 @@
-#!~/miniconda3/envs/tf2/bin/python
 import os
 import tensorflow as tf
 from model import BlazePose
@@ -38,18 +37,39 @@ if train_mode:
     import cv2
     import numpy as np
     y = np.zeros((2000, 14, 3)).astype(np.uint8)
-    y[0:1000] = model(data[0:1000]).numpy().astype(np.uint8)
-    y[1000:2000] = model(data[1000:2000]).numpy().astype(np.uint8)
+    if 1:   # for low profile GPU
+        batch_size = 20
+        for i in range(0, 2000, batch_size):
+            if i + batch_size >= 2000:
+                # last batch
+                y[i : 2000] = model(data[i : i + batch_size]).numpy()#.astype(np.uint8)
+            else:
+                # other batches
+                y[i : i + batch_size] = model(data[i : i + batch_size]).numpy()#.astype(np.uint8)
+                print("=", end="")
+        print(">")
+    else:   # for RTX 3090
+        print("Start inference.")
+        y[0:1000] = model(data[0:1000]).numpy().astype(np.uint8)
+        print("Half.")
+        y[1000:2000] = model(data[1000:2000]).numpy().astype(np.uint8)
+        print("Complete.")
     for t in range(2000):
         skeleton = y[t]
         print(skeleton)
         img = data[t].astype(np.uint8)
+        # draw the joints
         for i in range(14):
             cv2.circle(img, center=tuple(skeleton[i][0:2]), radius=2, color=(0, 255, 0), thickness=2)
+        # draw the lines
+        for j in ((13, 12), (12, 8), (12, 9), (8, 7), (7, 6), (9, 10), (10, 11), (2, 3), (2, 1), (1, 0), (3, 4), (4, 5)):
+            cv2.line(img, tuple(skeleton[j[0]][0:2]), tuple(skeleton[j[1]][0:2]), color=(0, 0, 255), thickness=1)
+        # solve the mid point of the hips
+        cv2.line(img, tuple(skeleton[12][0:2]), tuple(skeleton[2][0:2] // 2 + skeleton[3][0:2] // 2), color=(0, 0, 255), thickness=1))
+
         cv2.imwrite("./result/lsp_%d.jpg"%t, img)
         cv2.imshow("test", img)
         cv2.waitKey(1)
-        pass
 else:
     model.evaluate(test_dataset)
 
