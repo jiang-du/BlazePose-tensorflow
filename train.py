@@ -4,7 +4,7 @@ import tensorflow as tf
 import time
 from model import BlazePose
 from config import total_epoch, train_mode, continue_train, show_batch_loss
-from analysis import save_record
+from analysis import save_record, load_record
 
 if train_mode:
     from data import finetune_train as train_dataset
@@ -27,6 +27,13 @@ def grad(model, inputs, targets):
 # continue train
 if continue_train > 0:
     model.load_weights(checkpoint_path.format(epoch=continue_train))
+    # continue recording
+    train_loss_results, train_accuracy_results, val_accuracy_results = load_record()
+else:
+    # Initial for record of the training process
+    train_loss_results = []
+    train_accuracy_results = []
+    val_accuracy_results = []
 
 if train_mode:
     # finetune
@@ -39,18 +46,17 @@ else:
         print(layer)
         layer.trainable = False
 
-# Record the training process
-train_loss_results = []
-train_accuracy_results = []
-val_accuracy_results = []
-
 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), end="  Start train.\n")
 # validata initial loaded model
 val_accuracy = tf.keras.metrics.MeanSquaredError()
 for x, y in test_dataset:
     val_accuracy(y, model(x))
 print("Initial Validation accuracy: {:.5%}".format(val_accuracy.result()))
-for epoch in range(total_epoch):
+
+# make sure continue has any epoch to train
+assert(continue_train < total_epoch)
+
+for epoch in range(continue_train, total_epoch):
     epoch_loss_avg = tf.keras.metrics.Mean()
     epoch_accuracy = tf.keras.metrics.MeanSquaredError()
     val_accuracy = tf.keras.metrics.MeanSquaredError()
@@ -95,9 +101,9 @@ for epoch in range(total_epoch):
         model.save_weights(checkpoint_path.format(epoch=epoch))
         val_accuracy_results.append(val_accuracy.result())
 
-model.summary()
+        # save the training record at every validation epoch
+        save_record(train_loss_results, train_accuracy_results, val_accuracy_results)
 
-# save the training record
-save_record(train_loss_results, train_accuracy_results, val_accuracy_results)
+model.summary()
 
 print("Finish training.")

@@ -3,10 +3,16 @@ __pycache__
 .vscode
 
 dataset
-checkpoints
+checkpoints/
+checkpoints*
+backup
 
 *.jpg
 *.png
 *.svg
 *.pdf
 *.tflite
+
+# training records
+train_record.json
+train_record_pretrain.json

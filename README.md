@@ -10,48 +10,66 @@ Works are in process. The current version does not stand for the full functions.
 
 ## Requirements
 
-It is highly recommented to run this code on Ubuntu 20.04 with Anaconda environment.
+It is highly recommented to run this code on Ubuntu 20.04 with Anaconda environment. Python 3.7.9 and 3.8.5 has beed tested. CUDA version has been tested with `10.1` and `11.1`.
 
 ```
-python >= 3.8.5
 tensorflow >= 2.3
 numpy
 matplotlib
+scipy
 ```
 
-## Train
+## Train from random initialization
 
 1. Modify training settings in `config.py`.
 
-  For pre-train of heatmap, set `train_mode = 0`. Or fine-tune, set `train_mode = 1`.
+    For pre-train of heatmap, we should set `train_mode = 0`.
 
 2. Run `python3 train.py`.
 
 3. If you are the first time to run this code, LSP dataset will be downloaded. Especially, if you are using Microsoft Windows 10, please download and unzip the dataset manually.
 
+## Continue training
+
+1. Edit `config.py`, modify `continue_train` to the epoch where you want to start with.
+
+    For continue pre-train, simply set the value of `continue_train`.
+    
+    For fine-tune, set `train_mode = 1`, and `continue_train` to num of epoch where the training loss drops but testing accuracy achieve the optimal.
+
+2. Run `python3 train.py`.
+
 ## Test
 
 1. Modify training settings in `config.py`.
 
-  If you want to see the heatmaps, set `train_mode = 0`.
+    If you want to see the visualized heatmaps, set `train_mode = 0`.
   
-  For skeleton joint results, set `train_mode = 1`.
+    For skeleton joint results, set `train_mode = 1`.
 
 2. If you are the first time to test, open terminal:
 
-  ```bash
-  mkdir result
-  ```
+    ```bash
+    mkdir result
+    ```
 
 3. Run `python3 test.py`.
 
-  The tested images will be written in `result` dictionary.
+    The tested images will be written in `result` dictionary.
 
 ## TODOs
 
 - [x] Basic code for network model BlazePose.
 
-  - [x] Implementation of Channel Attention layer.
+    - [x] Implementation of Channel Attention layer.
+
+- [ ] Functions
+
+    - [x] Continue training from a custom epoch of checkpoint.
+
+    - [x] Save the training record (loss and accuracy for training and validation set) to json file.
+
+    - [ ] More explicit training settings (for fine-tune)
 
 - [ ] Dataset and preprocess.
 
