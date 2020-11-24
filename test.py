@@ -1,5 +1,6 @@
 import os
 import tensorflow as tf
+import numpy as np
 from model import BlazePose
 from config import total_epoch, train_mode
 from data import train_dataset, test_dataset, data
@@ -35,7 +36,6 @@ model.load_weights(checkpoint_path.format(epoch=199))
 
 if train_mode:
     import cv2
-    import numpy as np
     y = np.zeros((2000, 14, 3)).astype(np.uint8)
     if 1:   # for low profile GPU
         batch_size = 20
@@ -65,23 +65,30 @@ if train_mode:
         for j in ((13, 12), (12, 8), (12, 9), (8, 7), (7, 6), (9, 10), (10, 11), (2, 3), (2, 1), (1, 0), (3, 4), (4, 5)):
             cv2.line(img, tuple(skeleton[j[0]][0:2]), tuple(skeleton[j[1]][0:2]), color=(0, 0, 255), thickness=1)
         # solve the mid point of the hips
-        cv2.line(img, tuple(skeleton[12][0:2]), tuple(skeleton[2][0:2] // 2 + skeleton[3][0:2] // 2), color=(0, 0, 255), thickness=1))
+        cv2.line(img, tuple(skeleton[12][0:2]), tuple(skeleton[2][0:2] // 2 + skeleton[3][0:2] // 2), color=(0, 0, 255), thickness=1)
 
         cv2.imwrite("./result/lsp_%d.jpg"%t, img)
         cv2.imshow("test", img)
         cv2.waitKey(1)
 else:
+    # visualize the dataset
     model.evaluate(test_dataset)
 
-    y = model.predict(data[1000:1030])
+    # select an image to visualize
+    img_id = 1797
+    y = model.predict(data[img_id : img_id+1])
 
     import matplotlib.pyplot as plt
 
-    for t in range(30):
+    title_set = ["Right ankle", "Right knee", "Right hip", "Left hip", "Left knee", "Left ankle", "Right wrist", "Right elbow", "Right shoulder", "Left shoulder", "Left elbow", "Left wrist", "Neck", "Head top"]
+    for t in range(1):
         plt.figure(figsize=(8,8), dpi=150)
         for i in range(14):
             plt.subplot(4, 4, i+1)
             plt.imshow(y[t, :, :, i])
-        plt.savefig("demo.png")
+            plt.title(title_set[i])
+        plt.subplot(4, 4, 15)
+        plt.imshow(data[img_id].astype(np.uint8))
+        # plt.savefig("demo.png")
         plt.show()
 pass

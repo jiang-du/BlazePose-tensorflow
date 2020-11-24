@@ -19,17 +19,29 @@ matplotlib
 scipy
 ```
 
-## Train from random initialization
+## Train (from random initialization)
 
-1. Modify training settings in `config.py`.
+1. Download LSP dataset. (If you already have, just skip this step)
 
-    For pre-train of heatmap, we should set `train_mode = 0`.
+    If you are the first time to run this code on Linux platform, LSP dataset will be downloaded.
+    
+    However, if you are using Microsoft Windows 10, please download and unzip the dataset manually.
 
-2. Run `python3 train.py`.
+2. Pre-train the heatmap branch.
 
-3. If you are the first time to run this code, LSP dataset will be downloaded. Especially, if you are using Microsoft Windows 10, please download and unzip the dataset manually.
+    Edit training settings in `config.py`. Set `train_mode = 0` and `continue_train = 0`.
+
+    Then, run `python3 train.py`.
+
+3. Fine-tune for the joint regression branch.
+
+    Set `train_mode = 1`, `continue_train = 0` and `best_pre_train` with the num of epoch where the training loss drops but testing accuracy achieve the optimal.
+
+    Then, run `python3 train.py`.
 
 ## Continue training
+
+If you have just suffered from an unexpectedly power off or press `Ctrl + C` to cut up training, and then you want to continue your work, follow the following steps:
 
 1. Edit `config.py`, modify `continue_train` to the epoch where you want to start with.
 
@@ -38,6 +50,8 @@ scipy
     For fine-tune, set `train_mode = 1`, and `continue_train` to num of epoch where the training loss drops but testing accuracy achieve the optimal.
 
 2. Run `python3 train.py`.
+
+3. If you are running pre-train just now, after that, just set `train_mode = 1`, `continue_train = 0` and `best_pre_train` with the num of epoch where the training loss drops but testing accuracy achieve the optimal, and run `python3 train.py`.
 
 ## Test
 
@@ -65,11 +79,13 @@ scipy
 
 - [ ] Functions
 
+    - [x] Two stage training (pre-train and fine-tune).
+
     - [x] Continue training from a custom epoch of checkpoint.
 
     - [x] Save the training record (loss and accuracy for training and validation set) to json file.
 
-    - [ ] More explicit training settings (for fine-tune)
+    - [x] More explicit training settings (for fine-tune and continue training)
 
 - [ ] Dataset and preprocess.
 
@@ -79,7 +95,7 @@ scipy
 
     - [ ] Custom dataset.
 
-- [x] Two stage training (pre-train and fine-tune).
+- [ ] Implementation of pose tracking on video.
 
 - [ ] Online camera demo.
 

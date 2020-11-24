@@ -30,6 +30,12 @@ if continue_train > 0:
     # continue recording
     train_loss_results, train_accuracy_results, val_accuracy_results = load_record()
 else:
+    if train_mode:
+        # start fine-tune
+        from config import best_pre_train
+        model.load_weights(checkpoint_path.format(epoch=best_pre_train))
+    
+    # start from epoch 0
     # Initial for record of the training process
     train_loss_results = []
     train_accuracy_results = []
