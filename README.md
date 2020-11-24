@@ -55,21 +55,27 @@ If you have just suffered from an unexpectedly power off or press `Ctrl + C` to 
 
 ## Test
 
-1. Modify training settings in `config.py`.
+1. Edit `config.py`.
 
     If you want to see the visualized heatmaps, set `train_mode = 0`.
   
     For skeleton joint results, set `train_mode = 1`.
 
-2. If you are the first time to test, open terminal:
+2. Set `epoch_to_test` to the epoch you would like to test.
+
+3. If you set `train_mode = 0`, you should alse set `vis_img_id` to select an image.
+
+4. If you are the first time to set `train_mode = 1`, open terminal:
 
     ```bash
     mkdir result
     ```
 
-3. Run `python3 test.py`.
+5. Run `python3 test.py`.
 
-    The tested images will be written in `result` dictionary.
+    For `train_mode = 0`, you will see the heatmap.
+
+    For `train_mode = 1`, the tested images will be written in `result` dictionary.
 
 ## TODOs
 
@@ -77,7 +83,7 @@ If you have just suffered from an unexpectedly power off or press `Ctrl + C` to 
 
     - [x] Implementation of Channel Attention layer.
 
-- [ ] Functions
+- [x] Functions
 
     - [x] Two stage training (pre-train and fine-tune).
 

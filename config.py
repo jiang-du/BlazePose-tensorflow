@@ -14,4 +14,9 @@ continue_train = 0  # 0 for random initialize, >0 for num epoch
 if train_mode:
     best_pre_train = 434 # num of epoch where the training loss drops but testing accuracy achieve the optimal
 
+# for test only
+epoch_to_test = 199
+# for test the heatmap only
+vis_img_id = 1797
+
 json_name = "train_record.json" if train_mode else "train_record_pretrain.json"

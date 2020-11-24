@@ -2,7 +2,7 @@ import os
 import tensorflow as tf
 import numpy as np
 from model import BlazePose
-from config import total_epoch, train_mode
+from config import total_epoch, train_mode, epoch_to_test
 from data import train_dataset, test_dataset, data
 
 model = BlazePose()
@@ -15,7 +15,7 @@ checkpoint_path = "checkpoints/cp-{epoch:04d}.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
 # model.evaluate(test_dataset)
-model.load_weights(checkpoint_path.format(epoch=199))
+model.load_weights(checkpoint_path.format(epoch=epoch_to_test))
 
 """
 0-Right ankle
@@ -75,11 +75,10 @@ else:
     model.evaluate(test_dataset)
 
     # select an image to visualize
-    img_id = 1797
-    y = model.predict(data[img_id : img_id+1])
+    from config import vis_img_id
+    y = model.predict(data[vis_img_id : vis_img_id+1])
 
     import matplotlib.pyplot as plt
-
     title_set = ["Right ankle", "Right knee", "Right hip", "Left hip", "Left knee", "Left ankle", "Right wrist", "Right elbow", "Right shoulder", "Left shoulder", "Left elbow", "Left wrist", "Neck", "Head top"]
     for t in range(1):
         plt.figure(figsize=(8,8), dpi=150)
@@ -88,7 +87,7 @@ else:
             plt.imshow(y[t, :, :, i])
             plt.title(title_set[i])
         plt.subplot(4, 4, 15)
-        plt.imshow(data[img_id].astype(np.uint8))
+        plt.imshow(data[vis_img_id].astype(np.uint8))
         # plt.savefig("demo.png")
         plt.show()
 pass
