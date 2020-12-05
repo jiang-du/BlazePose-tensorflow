@@ -77,6 +77,16 @@ If you have just suffered from an unexpectedly power off or press `Ctrl + C` to 
 
     For `train_mode = 1`, the tested images will be written in `result` dictionary.
 
+## Online camera demo
+
+1. Install yolov4 package using `pip3 install yolov4`.
+
+2. Finish training on your dataset.
+
+3. Set `train_mode = 1` and connect to a USB camera.
+
+4. Run `python3 demo.py`. You should allow one or a few person(s) standing in front of the camera.
+
 ## TODOs
 
 - [x] Basic code for network model BlazePose.
@@ -103,7 +113,7 @@ If you have just suffered from an unexpectedly power off or press `Ctrl + C` to 
 
 - [ ] Implementation of pose tracking on video.
 
-- [ ] Online camera demo.
+- [x] Online camera demo.
 
 ## Reference
 
