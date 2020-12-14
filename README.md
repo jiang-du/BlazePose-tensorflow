@@ -1,6 +1,6 @@
 # A Tensorflow Implementation for BlazePose
 
-This is a third-party tensorflow implementation for BlazePose.
+This is a third-party TensorFlow implementation for BlazePose.
 
 The original paper is "BlazePose: On-device Real-time Body Pose tracking" by Valentin Bazarevsky, Ivan Grishchenko, Karthik Raveendran, Tyler Zhu, Fan Zhang, and Matthias Grundmann. Available on [arXiv](https://arxiv.org/abs/2006.10204).
 
@@ -10,7 +10,7 @@ Works are in process. The current version does not stand for the full functions.
 
 ## Requirements
 
-It is highly recommented to run this code on Ubuntu 20.04 with Anaconda environment. Python 3.7.9 and 3.8.5 has beed tested. CUDA version has been tested with `10.1` and `11.1`.
+It is highly recommended to run this code on Ubuntu 20.04 with an Anaconda environment. Python 3.7.9 and 3.8.5 has been tested. CUDA version has been tested with `10.1` and `11.1`.
 
 ```
 tensorflow >= 2.3
@@ -23,7 +23,7 @@ scipy
 
 1. Download LSP dataset. (If you already have, just skip this step)
 
-    If you are the first time to run this code on Linux platform, LSP dataset will be downloaded.
+    If you are the first time to run this code on Linux platform, the LSP dataset will be downloaded.
     
     However, if you are using Microsoft Windows 10, please download and unzip the dataset manually.
 
@@ -41,17 +41,17 @@ scipy
 
 ## Continue training
 
-If you have just suffered from an unexpectedly power off or press `Ctrl + C` to cut up training, and then you want to continue your work, follow the following steps:
+If you have just suffered from an unexpected power off or press `Ctrl + C` to cut up training, and then you want to continue your work, follow the following steps:
 
 1. Edit `config.py`, modify `continue_train` to the epoch where you want to start with.
 
     For continue pre-train, simply set the value of `continue_train`.
     
-    For fine-tune, set `train_mode = 1`, and `continue_train` to num of epoch where the training loss drops but testing accuracy achieve the optimal.
+    For fine-tuning, set `train_mode = 1`, and `continue_train` to num of epoches where the training loss drops but testing accuracy achieve the optimal.
 
 2. Run `python3 train.py`.
 
-3. If you are running pre-train just now, after that, just set `train_mode = 1`, `continue_train = 0` and `best_pre_train` with the num of epoch where the training loss drops but testing accuracy achieve the optimal, and run `python3 train.py`.
+3. If you are running pre-train just now, after that, just set `train_mode = 1`, `continue_train = 0`, and `best_pre_train` with the num of epoches where the training loss drops but testing accuracy achieve the optimal, and run `python3 train.py`.
 
 ## Test
 
@@ -63,23 +63,29 @@ If you have just suffered from an unexpectedly power off or press `Ctrl + C` to 
 
 2. Set `epoch_to_test` to the epoch you would like to test.
 
-3. If you set `train_mode = 0`, you should alse set `vis_img_id` to select an image.
+3. If you set `train_mode = 0`, you should also set `vis_img_id` to select an image.
 
-4. If you are the first time to set `train_mode = 1`, open terminal:
+4. For `train_mode = 1`, evaluation mode should be set.
+
+    Set `eval_mode = 1` if you want to get PCKh@0.5 score, or `eval_mode = 0` if you want to get the result images.
+
+5. If you are the first time to set `train_mode = 1` and `eval_mode = 0`, open terminal:
 
     ```bash
     mkdir result
     ```
 
-5. Run `python3 test.py`.
+6. Run `python3 test.py`.
 
     For `train_mode = 0`, you will see the heatmap.
 
-    For `train_mode = 1`, the tested images will be written in `result` dictionary.
+    For `train_mode = 1` and `eval_mode = 0`, the tested images will be written in `result` dictionary.
+
+    For `train_mode = 1` and `eval_mode = 1`, PCKh@0.5 scores of each joint and the average score will be shown.
 
 ## Online camera demo
 
-1. Install yolov4 package using `pip3 install yolov4`.
+1. Install YOLOv4 package using `pip3 install yolov4`. The trained model of YOLOv4 should also be downloaded.
 
 2. Finish training on your dataset.
 
@@ -95,13 +101,15 @@ If you have just suffered from an unexpectedly power off or press `Ctrl + C` to 
 
 - [x] Functions
 
-    - [x] Two stage training (pre-train and fine-tune).
+    - [x] Two-stage training (pre-train and fine-tune).
 
     - [x] Continue training from a custom epoch of checkpoint.
 
     - [x] Save the training record (loss and accuracy for training and validation set) to json file.
 
-    - [x] More explicit training settings (for fine-tune and continue training)
+    - [x] More explicit training settings (for fine-tune and continue training).
+    
+    - [x] Calculate PCKh@0.5 scores.
 
 - [ ] Dataset and preprocess.
 
