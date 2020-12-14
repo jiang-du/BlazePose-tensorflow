@@ -6,7 +6,10 @@ gpu_dynamic_memory = 0
 gaussian_sigma = 4
 
 # Train mode: 0-pre-train, 1-finetune
-train_mode = 0
+train_mode = 1
+
+# Evaluation mode: 0-get result images, 1-get PCK score only
+eval_mode = 1
 
 show_batch_loss = 0
 continue_train = 0  # 0 for random initialize, >0 for num epoch
